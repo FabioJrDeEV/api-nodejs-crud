@@ -3,6 +3,7 @@ import cors from "cors";
 import pool from "./db.js";
 
 const app = express();
+const port = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(cors());
@@ -72,5 +73,5 @@ app.delete("/tasks/:id", async (req, res) => {
 });
 
 app.listen(3000, () => {
-  console.log("App rodando!");
+  console.log(`App rodando na porta ${port}`);
 });
