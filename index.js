@@ -4,7 +4,7 @@ import pool from "./db.js";
 
 const app = express();
 
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(cors());
@@ -12,7 +12,7 @@ app.use(cors());
 app.get("/tasks", async (req, res) => {
   try {
     const resposta = await pool.query(
-      "SELECT * FROM banco-do-crud ORDER BY id"
+      "SELECT * FROM banco_do_crud ORDER BY id"
     );
     res.status(200).json(resposta.rows);
   } catch (err) {
@@ -26,7 +26,7 @@ app.get("/tasks/:id", async (req, res) => {
 
   try {
     const resposta = await pool.query(
-      "SELECT * FROM banco-do-crud WHERE id = $1",
+      "SELECT * FROM banco_do_crud WHERE id = $1",
       [id]
     );
     res.status(200).json(resposta.rows[0]);
@@ -37,12 +37,12 @@ app.get("/tasks/:id", async (req, res) => {
 });
 
 app.post("/tasks", async (req, res) => {
-  const { title, description } = req.body;
+  const { title, description, day, completed } = req.body;
 
   try {
     await pool.query(
-      "INSERT INTO banco-do-crud (title, description) VALUES ($1, $2)",
-      [title, description]
+      "INSERT INTO banco_do_crud (title, description, day, completed) VALUES ($1, $2, $3, $4)",
+      [title, description, day, completed]
     );
     res.status(201).send("Task criada com sucesso!");
   } catch (err) {
@@ -53,12 +53,12 @@ app.post("/tasks", async (req, res) => {
 
 app.put("/tasks/:id", async (req, res) => {
   const id = parseInt(req.params.id);
-  const { title, description } = req.body;
+  const { title, description, day, completed } = req.body;
 
   try {
     await pool.query(
-      "UPDATE banco-do-crud SET title = $1, description = $2 WHERE id = $3 RETURNING *",
-      [title, description, id]
+      "UPDATE banco_do_crud SET title = $1, description = $2, day = $3, completed = $4 WHERE id = $5 RETURNING *",
+      [title, description, day, completed, id]
     );
     res.status(200).send("Atualizado com sucesso!");
   } catch (err) {
@@ -70,7 +70,7 @@ app.put("/tasks/:id", async (req, res) => {
 app.delete("/tasks/:id", async (req, res) => {
   const id = parseInt(req.params.id);
   try {
-    await pool.query("DELETE FROM banco-do-crud WHERE id = $1", [id]);
+    await pool.query("DELETE FROM banco_do_crud WHERE id = $1", [id]);
     res.status(200).send("Tarefas deletada com sucesso!");
   } catch (err) {
     console.log(err);
@@ -79,5 +79,5 @@ app.delete("/tasks/:id", async (req, res) => {
 });
 
 app.listen(3000, () => {
-  console.log(`App rodando na porta ${port}`);
+  console.log(`App rodando na porta ${PORT}`);
 });
