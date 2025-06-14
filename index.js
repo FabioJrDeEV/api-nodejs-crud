@@ -40,11 +40,11 @@ app.post("/tasks", async (req, res) => {
   const { title, description, day, completed } = req.body;
 
   try {
-    await pool.query(
+    const resultado = await pool.query(
       "INSERT INTO banco_do_crud (title, description, day, completed) VALUES ($1, $2, $3, $4)",
       [title, description, day, completed]
     );
-    res.status(201).json();
+    res.status(201).json(resultado.rows[0]);
   } catch (err) {
     console.log(err);
     res.status(500).send("Erro ao adicionar task");
