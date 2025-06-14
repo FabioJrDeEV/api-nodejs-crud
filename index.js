@@ -41,7 +41,7 @@ app.post("/tasks", async (req, res) => {
 
   try {
     const resultado = await pool.query(
-      "INSERT INTO banco_do_crud (title, description, completed) VALUES ($1, $2, $3, $4) RETURNING *",
+      "INSERT INTO banco_do_crud (title, description, completed) VALUES ($1, $2, $3) RETURNING *",
       [title, description, completed]
     );
     res.status(201).json(resultado.rows[0]);
