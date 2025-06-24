@@ -24,7 +24,7 @@ router.post("/register", async (req, res) => {
       email,
     ]);
     if (users.rows.length > 0) {
-      res.status(400).json({ erro: "E-mail já existe" });
+      return res.status(400).json({ erro: "E-mail já existe" });
     }
 
     const result = await pool.query(
@@ -60,9 +60,7 @@ router.post("/login", async (req, res) => {
     const token = jwt.sign({ userId: user.id }, SECRET, { expiresIn: "1h" });
 
     res.json(token);
-  } catch (err) {
-    console.log(err);
-  }
+  } catch (err) {}
 });
 
 export default router;
