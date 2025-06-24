@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import pool from "./db.js";
+import authRoutes from "./auth/auth.js";
+import authMiddleware from "./auth/authMiddleware.js";
 
 const app = express();
 
@@ -8,11 +10,15 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(cors());
+app.use(authRoutes);
 
-app.get("/tasks", async (req, res) => {
+app.get("/tasks", authMiddleware, async (req, res) => {
+  const userId = req.userId;
+
   try {
     const resposta = await pool.query(
-      "SELECT * FROM banco_do_crud ORDER BY id"
+      "SELECT * FROM banco_do_crud WHERE user_id = $1 ORDER BY id",
+      [userId]
     );
     res.status(200).json(resposta.rows);
   } catch (err) {
@@ -36,13 +42,14 @@ app.get("/tasks/:id", async (req, res) => {
   }
 });
 
-app.post("/tasks", async (req, res) => {
+app.post("/tasks", authMiddleware, async (req, res) => {
   const { title, description, day, completed } = req.body;
+  const userId = req.userId;
 
   try {
     const resultado = await pool.query(
-      "INSERT INTO banco_do_crud (title, description, completed) VALUES ($1, $2, $3) RETURNING *",
-      [title, description, completed]
+      "INSERT INTO banco_do_crud (title, description, user_id) VALUES ($1, $2, $3) RETURNING *",
+      [title, description, userId]
     );
     res.status(201).json(resultado.rows[0]);
   } catch (err) {
