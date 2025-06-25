@@ -13,7 +13,7 @@ app.use(cors());
 app.use(authRoutes);
 
 app.get("/tasks", authMiddleware, async (req, res) => {
-  const userId = req.userId;
+  const userId = req.user.userId;
 
   try {
     const resposta = await pool.query(
@@ -44,7 +44,7 @@ app.get("/tasks/:id", async (req, res) => {
 
 app.post("/tasks", authMiddleware, async (req, res) => {
   const { title, description } = req.body;
-  const userId = req.userId;
+  const userId = req.user.userId;
 
   try {
     const resultado = await pool.query(
