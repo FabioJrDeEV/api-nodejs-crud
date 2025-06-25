@@ -20,7 +20,7 @@ function authMiddleware(req, res, next) {
     //Decodifica o token e faz a verificação se o token é válido.
     const decoded = jwt.verify(token, SECRET);
     //Seta os dados no user.
-    req.user = decoded;
+    req.user = { userId: decoded.userId };
     next();
   } catch (err) {
     return res.status(401).json({ erro: "Token Inválido" });
