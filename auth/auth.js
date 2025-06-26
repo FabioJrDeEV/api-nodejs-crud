@@ -11,9 +11,10 @@ router.post(
   "/register",
   [
     body("email").custom(async (value) => {
-      const result = pool.query("SELECT * FROM db_users WHERE email = $1", [
-        value,
-      ]);
+      const result = await pool.query(
+        "SELECT * FROM db_users WHERE email = $1",
+        [value]
+      );
       if (result.rows.length > 0) {
         return res.status(400).json({ erro: "E-mail já cadastrado!" });
       }
