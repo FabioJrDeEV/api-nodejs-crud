@@ -59,7 +59,7 @@ app.post(
     if (!errors.isEmpty(req)) {
       return res.status(400).json({ error: errors.array() });
     }
-    res.send("Tudo ok");
+
     try {
       const resultado = await pool.query(
         "INSERT INTO tasks (title, description, user_id) VALUES ($1, $2, $3) RETURNING *",
