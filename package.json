@@ -20,6 +20,7 @@
     "pg": "^8.16.0"
   },
   "devDependencies": {
+    "express-validator": "^7.2.1",
     "nodemon": "^3.1.10"
   }
 }
