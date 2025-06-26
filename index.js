@@ -95,10 +95,10 @@ app.put(
         "UPDATE tasks SET title = $1, description = $2, completed = $3 WHERE id = $4 RETURNING *",
         [title, description, completed, id]
       );
-      res.status(200).send("Atualizado com sucesso!");
+      res.status(200).json({ message: "Atualizado com sucesso!" });
     } catch (err) {
       console.log(err);
-      res.status(500).send("A atualização falhou...");
+      res.status(500).json({ erro: "Erro ao atualizar usuario" });
     }
   }
 );
@@ -107,10 +107,10 @@ app.delete("/tasks/:id", async (req, res) => {
   const id = parseInt(req.params.id);
   try {
     await pool.query("DELETE FROM tasks WHERE id = $1", [id]);
-    res.status(200).send("Tarefas deletada com sucesso!");
+    res.status(200).json({ message: "Tarefas deletada com sucesso!" });
   } catch (err) {
     console.log(err);
-    res.status(500).send("Erro ao deletar usuario...");
+    res.status(500).json({ erro: "Erro ao deletar usuario" });
   }
 });
 
