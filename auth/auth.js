@@ -2,7 +2,7 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import pool from "../db.js";
-import { body, validationResult } from "express-validation";
+import { body, validationResult } from "express-validator";
 
 const router = express.Router();
 const SECRET = process.env.JWT_AUTH;
