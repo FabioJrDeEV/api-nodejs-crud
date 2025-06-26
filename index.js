@@ -80,7 +80,7 @@ app.put(
   "/tasks/:id",
   [
     body("title").notEmpty().withMessage("O campo de titulo é obrigatorio!"),
-    body("descrition")
+    body("description")
       .trim()
       .isEmpty()
       .withMessage("O campo de descrição é obrigatorio!"),
