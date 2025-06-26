@@ -3,6 +3,7 @@ import cors from "cors";
 import pool from "./db.js";
 import authRoutes from "./auth/auth.js";
 import authMiddleware from "./auth/authMiddleware.js";
+import { body, validationResult } from "express-validator";
 
 const app = express();
 
@@ -17,7 +18,7 @@ app.get("/tasks", authMiddleware, async (req, res) => {
 
   try {
     const resposta = await pool.query(
-      "SELECT * FROM banco_do_crud WHERE user_id = $1 ORDER BY id",
+      "SELECT * FROM tasks WHERE user_id = $1 ORDER BY id",
       [userId]
     );
     res.status(200).json(resposta.rows);
@@ -31,10 +32,9 @@ app.get("/tasks/:id", async (req, res) => {
   const id = parseInt(req.params.id);
 
   try {
-    const resposta = await pool.query(
-      "SELECT * FROM banco_do_crud WHERE id = $1",
-      [id]
-    );
+    const resposta = await pool.query("SELECT * FROM tasks WHERE id = $1", [
+      id,
+    ]);
     res.status(200).json(resposta.rows[0]);
   } catch (err) {
     console.log(err);
@@ -42,42 +42,79 @@ app.get("/tasks/:id", async (req, res) => {
   }
 });
 
-app.post("/tasks", authMiddleware, async (req, res) => {
-  const { title, description } = req.body;
-  const userId = req.user.userId;
+app.post(
+  "/tasks",
+  [
+    body("title")
+      .trim()
+      .isEmpty()
+      .withMessage("O campo de titulo é obrigatorio!"),
+    body("description")
+      .trim()
+      .isEmpty()
+      .withMessage("O campo de descrição é obrigatorio!"),
+  ],
+  authMiddleware,
+  async (req, res) => {
+    const { title, description } = req.body;
+    const userId = req.user.userId;
+    const errors = validationResult(req);
 
-  try {
-    const resultado = await pool.query(
-      "INSERT INTO banco_do_crud (title, description, user_id) VALUES ($1, $2, $3) RETURNING *",
-      [title, description, userId]
-    );
-    res.status(201).json(resultado.rows[0]);
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Erro ao adicionar task");
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ error: errors.array() });
+    }
+    res.send("Tudo ok");
+    try {
+      const resultado = await pool.query(
+        "INSERT INTO tasks (title, description, user_id) VALUES ($1, $2, $3) RETURNING *",
+        [title, description, userId]
+      );
+      res.status(201).json(resultado.rows[0]);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send("Erro ao adicionar task");
+    }
   }
-});
+);
 
-app.put("/tasks/:id", async (req, res) => {
-  const id = parseInt(req.params.id);
-  const { title, description, day, completed } = req.body;
+app.put(
+  "/tasks/:id",
+  [
+    body("title")
+      .trim()
+      .isEmpty()
+      .withMessage("O campo de titulo é obrigatorio!"),
+    body("descrition")
+      .trim()
+      .isEmpty()
+      .withMessage("O campo de descrição é obrigatorio!"),
+  ],
+  async (req, res) => {
+    const id = parseInt(req.params.id);
+    const { title, description, completed } = req.body;
+    const erros = validationResult(req);
 
-  try {
-    await pool.query(
-      "UPDATE banco_do_crud SET title = $1, description = $2, day = $3, completed = $4 WHERE id = $5 RETURNING *",
-      [title, description, day, completed, id]
-    );
-    res.status(200).send("Atualizado com sucesso!");
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("A atualização falhou...");
+    if (!erros.isEmpty()) {
+      return res.status(400).json({ error: erros.array() });
+    }
+
+    try {
+      await pool.query(
+        "UPDATE tasks SET title = $1, description = $2, completed = $3 WHERE id = $4 RETURNING *",
+        [title, description, completed, id]
+      );
+      res.status(200).send("Atualizado com sucesso!");
+    } catch (err) {
+      console.log(err);
+      res.status(500).send("A atualização falhou...");
+    }
   }
-});
+);
 
 app.delete("/tasks/:id", async (req, res) => {
   const id = parseInt(req.params.id);
   try {
-    await pool.query("DELETE FROM banco_do_crud WHERE id = $1", [id]);
+    await pool.query("DELETE FROM tasks WHERE id = $1", [id]);
     res.status(200).send("Tarefas deletada com sucesso!");
   } catch (err) {
     console.log(err);
