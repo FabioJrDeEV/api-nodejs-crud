@@ -56,7 +56,7 @@ app.post(
     const userId = req.user.userId;
     const errors = validationResult(req);
 
-    if (!errors.isEmpty()) {
+    if (!errors.isEmpty(req)) {
       return res.status(400).json({ error: errors.array() });
     }
     res.send("Tudo ok");
@@ -86,7 +86,7 @@ app.put(
     const { title, description, completed } = req.body;
     const erros = validationResult(req);
 
-    if (!erros.isEmpty()) {
+    if (!erros.isEmpty(req)) {
       return res.status(400).json({ error: erros.array() });
     }
 
