@@ -10,15 +10,18 @@ const SECRET = process.env.JWT_AUTH;
 router.post(
   "/register",
   [
-    body("email").custom(async (value) => {
-      const result = await pool.query(
-        "SELECT * FROM db_users WHERE email = $1",
-        [value]
-      );
-      if (result.rows.length > 0) {
-        return res.status(400).json({ erro: "E-mail já cadastrado!" });
-      }
-    }),
+    body("email")
+      .isEmail()
+      .withMessage("E-mail inválido")
+      .custom(async (value) => {
+        const result = await pool.query(
+          "SELECT * FROM db_users WHERE email = $1",
+          [value]
+        );
+        if (result.rows.length > 0) {
+          throw new Error("E-mail já cadastrado!");
+        }
+      }),
   ],
   async (req, res) => {
     const { email, password } = req.body;
