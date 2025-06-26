@@ -45,10 +45,7 @@ app.get("/tasks/:id", async (req, res) => {
 app.post(
   "/tasks",
   [
-    body("title")
-      .trim()
-      .isEmpty()
-      .withMessage("O campo de titulo é obrigatorio!"),
+    body("title").notEmpty().withMessage("O campo de titulo é obrigatorio!"),
     body("description")
       .notEmpty()
       .withMessage("O campo de descrição é obrigatorio!"),
@@ -81,8 +78,7 @@ app.put(
   [
     body("title").notEmpty().withMessage("O campo de titulo é obrigatorio!"),
     body("description")
-      .trim()
-      .isEmpty()
+      .notEmpty()
       .withMessage("O campo de descrição é obrigatorio!"),
   ],
   async (req, res) => {
