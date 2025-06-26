@@ -22,6 +22,9 @@ router.post(
           throw new Error("E-mail já cadastrado!");
         }
       }),
+    body("password")
+      .isLength({ min: 8 })
+      .withMessage("Senha deve conter 8 digitios"),
   ],
   async (req, res) => {
     const { email, password } = req.body;
