@@ -50,8 +50,7 @@ app.post(
       .isEmpty()
       .withMessage("O campo de titulo é obrigatorio!"),
     body("description")
-      .trim()
-      .isEmpty()
+      .notEmpty()
       .withMessage("O campo de descrição é obrigatorio!"),
   ],
   authMiddleware,
@@ -80,10 +79,7 @@ app.post(
 app.put(
   "/tasks/:id",
   [
-    body("title")
-      .trim()
-      .isEmpty()
-      .withMessage("O campo de titulo é obrigatorio!"),
+    body("title").notEmpty().withMessage("O campo de titulo é obrigatorio!"),
     body("descrition")
       .trim()
       .isEmpty()
