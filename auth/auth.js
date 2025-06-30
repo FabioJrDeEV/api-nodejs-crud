@@ -62,7 +62,11 @@ router.post(
           "SELECT * FROM db_users WHERE email = $1",
           [value]
         );
-        // const user = result.rows[0];
+        const user = result.rows[0];
+
+        if (!user) {
+          return res.status(400).json({ erro: "Usuario não identificado!" });
+        }
       }),
     body("password")
       .isLength({ min: 8 })
