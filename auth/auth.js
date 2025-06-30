@@ -65,12 +65,17 @@ router.post(
         const user = result.rows[0];
 
         if (!user) {
-          return res.status(400).json({ erro: "Usuario não identificado!" });
+          throw new Error("Usuario não encontrado!");
         }
       }),
     body("password")
       .isLength({ min: 8 })
-      .withMessage("A senha deve conter 8 digitos"),
+      .withMessage("A senha deve conter 8 digitos")
+      .custom((value) => {
+        if (!value) {
+          throw new Error("A senha deve conter 8 digitos!");
+        }
+      }),
   ],
   async (req, res) => {
     const { email, password } = req.body;
