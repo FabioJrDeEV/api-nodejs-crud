@@ -54,28 +54,10 @@ router.post(
 router.post(
   "/login",
   [
-    body("email")
-      .isEmail()
-      .withMessage("Insira um e-mail valido")
-      .custom(async (value) => {
-        const result = await pool.query(
-          "SELECT * FROM db_users WHERE email = $1",
-          [value]
-        );
-        const user = result.rows[0];
-
-        if (!user) {
-          throw new Error("Usuario não encontrado!");
-        }
-      }),
+    body("email").isEmail().withMessage("Insira um e-mail valido"),
     body("password")
       .isLength({ min: 8 })
-      .withMessage("A senha deve conter 8 digitos")
-      .custom((value) => {
-        if (!value) {
-          throw new Error("A senha deve conter 8 digitos!");
-        }
-      }),
+      .withMessage("A senha deve conter 8 digitos"),
   ],
   async (req, res) => {
     const { email, password } = req.body;
@@ -86,20 +68,22 @@ router.post(
     }
 
     try {
-      //teste de validação de email usando o express-validator como middleware na função
-      /*const user = result.rows[0];
+      const result = await pool.query(
+        "SELECT * FROM db_users WHERE email = $1",
+        [email]
+      );
+
+      const user = result.rows[0];
 
       if (!user) {
         return res.status(400).json({ erro: "Usuario não encontrado!" });
-      }*/
+      }
 
-      //mesma coisa teste de validação com express-validator
+      const pass = await bcrypt.compare(password, user.password);
 
-      //const pass = await bcrypt.compare(password, user.password);
-
-      //if (!pass) {
-      //return res.status(400).json({ erro: "Senha inválida!" });
-      // }
+      if (!pass) {
+        return res.status(400).json({ erro: "Senha inválida!" });
+      }
 
       const token = jwt.sign({ userId: user.id }, SECRET, { expiresIn: "1h" });
 
