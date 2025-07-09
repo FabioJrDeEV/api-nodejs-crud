@@ -17,6 +17,7 @@ app.get("/tasks", authMiddleware, async (req, res) => {
   const userId = req.user.userId;
 
   try {
+    await pool.query("DELETE FROM tasks WHERE dias < CURRENT_DATE");
     const resposta = await pool.query(
       "SELECT * FROM tasks WHERE user_id = $1 ORDER BY id",
       [userId]
@@ -83,7 +84,7 @@ app.put(
   ],
   async (req, res) => {
     const id = parseInt(req.params.id);
-    const { title, description } = req.body;
+    const { title, description, dias } = req.body;
     const erros = validationResult(req);
 
     if (!erros.isEmpty(req)) {
@@ -92,8 +93,8 @@ app.put(
 
     try {
       await pool.query(
-        "UPDATE tasks SET title = $1, description = $2, WHERE id = $3 RETURNING *",
-        [title, description, id]
+        "UPDATE tasks SET title = $1, description = $2, dias = $3 WHERE id = $4 RETURNING *",
+        [title, description, dias, id]
       );
       res.status(200).json({ message: "Atualizado com sucesso!" });
     } catch (err) {
