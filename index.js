@@ -24,7 +24,7 @@ app.get("/tasks", authMiddleware, async (req, res) => {
     res.status(200).json(resposta.rows);
   } catch (err) {
     console.log(err);
-    res.status(404).send("Deu merda ai.");
+    res.status(404).json({ error: "Erro ao buscar tarefas!" });
   }
 });
 
@@ -38,7 +38,7 @@ app.get("/tasks/:id", async (req, res) => {
     res.status(200).json(resposta.rows[0]);
   } catch (err) {
     console.log(err);
-    res.status(404).send("Erro ao encontar task");
+    res.status(404).json({ error: "Erro ao encontar task" });
   }
 });
 
@@ -52,7 +52,7 @@ app.post(
   ],
   authMiddleware,
   async (req, res) => {
-    const { title, description, completed } = req.body;
+    const { title, description, completed, dias } = req.body;
     const userId = req.user.userId;
     const errors = validationResult(req);
 
@@ -62,13 +62,13 @@ app.post(
 
     try {
       const resultado = await pool.query(
-        "INSERT INTO tasks (title, description, completed ,user_id) VALUES ($1, $2, $3, $4) RETURNING *",
-        [title, description, completed, userId]
+        "INSERT INTO tasks (title, description, completed ,user_id, dias) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+        [title, description, completed, userId, dias]
       );
       res.status(201).json(resultado.rows[0]);
     } catch (err) {
       console.log(err);
-      res.status(500).json({ erro: "Erro ao adicionar task" });
+      res.status(500).json({ error: "Erro ao adicionar task" });
     }
   }
 );
@@ -98,7 +98,7 @@ app.put(
       res.status(200).json({ message: "Atualizado com sucesso!" });
     } catch (err) {
       console.log(err);
-      res.status(500).json({ erro: "Erro ao atualizar usuario" });
+      res.status(500).json({ error: "Erro ao atualizar usuario" });
     }
   }
 );
@@ -110,7 +110,7 @@ app.delete("/tasks/:id", async (req, res) => {
     res.status(200).json({ message: "Tarefas deletada com sucesso!" });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ erro: "Erro ao deletar usuario" });
+    res.status(500).json({ error: "Erro ao deletar usuario" });
   }
 });
 
