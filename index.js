@@ -85,8 +85,6 @@ app.put(
   async (req, res) => {
     const id = parseInt(req.params.id);
     const { title, description, dias } = req.body;
-    const date = new Date(dias);
-    const dateBr = date.toLocaleDateString("pt-BR");
     const erros = validationResult(req);
 
     if (!erros.isEmpty(req)) {
@@ -96,7 +94,7 @@ app.put(
     try {
       await pool.query(
         "UPDATE tasks SET title = $1, description = $2, dias = $3 WHERE id = $4 RETURNING *",
-        [title, description, dateBr, id]
+        [title, description, dias, id]
       );
       res.status(200).json({ message: "Atualizado com sucesso!" });
     } catch (err) {
