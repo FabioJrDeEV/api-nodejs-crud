@@ -17,7 +17,6 @@ app.get("/tasks", authMiddleware, async (req, res) => {
   const userId = req.user.userId;
 
   try {
-    await pool.query("DELETE FROM tasks WHERE dias < CURRENT_DATE");
     const resposta = await pool.query(
       "SELECT * FROM tasks WHERE user_id = $1 ORDER BY id",
       [userId]
